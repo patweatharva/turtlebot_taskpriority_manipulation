@@ -1,11 +1,14 @@
 #!/usr/bin/env python
 import rospy 
-from utils import task,mobile_manipulator
+from utils import task, mobile_manipulator, taskhandler
 
-class TP_control:
+class TP_controller:
     def __init__(self, joint_state_topic, odom_topic, task_topic, cmd_vel_topic, cmd_dq_topic):
-        rospy.init_node("TP_control")
+        rospy.init_node("TP_control_node")
         rospy.loginfo("Starting Task Priority Controller....")
+        
+        robot = mobile_manipulator()
+        taskhandler = taskhandler(robot)
         
         self.joint_state_sub=rospy.Subscriber(joint_state_topic, Type, self.jointstateCB)
         self.odom_sub=rospy.Subscriber(odom_topic, type, self.odomCB)
@@ -44,5 +47,5 @@ class TP_control:
         
 
 if __name__ == "__main__":
-    ros_node = TP_control()
+    ros_node = TP_controller()
     rospy.spin()

@@ -37,7 +37,7 @@ class Task:
         Args:
             robot (Manipulator): Reference to the manipulator object.
         """
-        pass
+        pass # Overridden in child class
 
     def setDesired(self, value):
         """
