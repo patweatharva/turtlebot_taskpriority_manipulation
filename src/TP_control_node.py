@@ -24,6 +24,7 @@ class TP_controller:
         # Command Velocity Publishers
         self.cmd_pub = rospy.Publisher(cmd_vel_topic, type, queue_size=1)
         self.dq_pub = rospy.Publisher(cmd_dq_topic, type, queue_size=1)
+        self.err_pub = rospy.Publisher("/error_topic", type, queue_size=1)
         
     
     

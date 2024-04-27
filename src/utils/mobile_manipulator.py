@@ -100,33 +100,34 @@ class MobileManipulator:
         Tb= getTransformation("lin",'x',x)@getTransformation("lin","y",y)@ getTransformation("ang","z",yaw)
         
         # Following code can be used to get the series of Transformations
-        
-        # Tb = getTotalTransformation(["ang","ang",
-        #                              "ang","ang",
-        #                              "ang",
-        #                              "lin","ang",
-        #                              "lin","ang","ang",
-        #                              "lin","lin"],
-        #                             ["z","x"
-        #                             "z","x",
-        #                             "z",
-        #                             "z","x",
-        #                             "z","z","x",
-        #                             "z","x"],
-        #                             [yaw,-np.pi/2,
-        #                             np.pi/2,np.pi/2,
-        #                             0,
-        #                             0,-np.pi/2,
-        #                             0,-np.pi/2,np.pi/2,
-        #                             0,self.r])  # Transformation of the mobile base
+        '''
+        Tb = getTotalTransformation(["ang","ang",
+                                     "ang","ang",
+                                     "ang",
+                                     "lin","ang",
+                                     "lin","ang","ang",
+                                     "lin","lin"],
+                                    ["z","x"
+                                    "z","x",
+                                    "z",
+                                    "z","x",
+                                    "z","z","x",
+                                    "z","x"],
+                                    [yaw,-np.pi/2,
+                                    np.pi/2,np.pi/2,
+                                    0,
+                                    0,-np.pi/2,
+                                    0,-np.pi/2,np.pi/2,
+                                    0,self.r])  # Transformation of the mobile base
 
-        ### Additional rotations performed, to align the axis:
-        # Rotate Z +90 (using the theta of the first base joint)
-        # Rotate X +90 (using the alpha of the first base joint)
-        ## Z now aligns with the forward velocity of the base
-        # Rotate X -90 (using the alpha of the second base joint)
-        ## Z is now back to vertical position
-        # Rotate Z -90 (using the theta of the first manipulator joint)
+        ## Additional rotations performed, to align the axis:
+        Rotate Z +90 (using the theta of the first base joint)
+        Rotate X +90 (using the alpha of the first base joint)
+        # Z now aligns with the forward velocity of the base
+        Rotate X -90 (using the alpha of the second base joint)
+        # Z is now back to vertical position
+        Rotate Z -90 (using the theta of the first manipulator joint)
+        '''
 
         # Modify the theta of the base joint, to account for an additional Z rotation
         self.theta[0] -= deg90
