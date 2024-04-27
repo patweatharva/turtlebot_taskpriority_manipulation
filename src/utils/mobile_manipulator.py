@@ -143,8 +143,8 @@ class MobileManipulator:
     ''' 
         Method that returns the characteristic points of the robot.
     '''
-    def drawing(self):
-        return robotPoints2D(self.T)
+    # def drawing(self):
+    #     return robotPoints2D(self.T)
 
     '''
         Method that returns the end-effector Jacobian.
