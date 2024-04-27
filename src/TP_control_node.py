@@ -25,7 +25,7 @@ class TP_controller:
         self.cmd_pub = rospy.Publisher(cmd_vel_topic, type, queue_size=1)
         self.dq_pub = rospy.Publisher(cmd_dq_topic, type, queue_size=1)
         
-
+    
     
     def jointstateCB(self,state):
         pass

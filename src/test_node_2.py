@@ -8,7 +8,7 @@ from sensor_msgs.msg import JointState
 from geometry_msgs.msg import PoseStamped
 from geometry_msgs.msg import TransformStamped
 from visualization_msgs.msg import Marker
-from tf.transformations import euler_from_quaternion, quaternion_from_euler
+from tf.transformations import quaternion_from_euler
 
 
 class SwiftproController:
@@ -70,11 +70,13 @@ class SwiftproController:
         print(self.z)
         print(self.yaw) 
         
+        #transformation matrix
         self.T = np.array([[np.cos(self.yaw), -np.sin(self.yaw), 0, self.x],
                             [np.sin(self.yaw), np.cos(self.yaw), 0, self.y],
                             [0, 0, 1, self.z],
                             [1, 0, 0, 1]])
         
+        #ee updated pose publisher
         if self.publish_tf:
         
             transform = TransformStamped()
@@ -95,9 +97,6 @@ class SwiftproController:
             transform.transform.rotation.w = quaternion[3]
             self.tf_broadcaster.sendTransform(transform)
             
-            # self.ee_publisher(x, y, z, yaw)
-            # self.ee_tf_publisher(x, y, z, yaw)
-            
     
     def getEEJacobian(self):
         J = np.zeros((6, self.dof))
@@ -108,10 +107,10 @@ class SwiftproController:
         d2p = self.d2*np.cos(q3) #projection of d2 on x-axis
         l = self.bx + self.mx + d1p + d2p #total length from base to ee top projection 
         
-        J[:,0] = np.array([l*np.sin(q1),                    l*np.cos(q1),                   0,                0, 0, 1])
-        J[:,1] = np.array([-self.d1*np.cos(q2)*np.cos(q1), -self.d1*np.cos(q2)*np.sin(q1), self.d1*np.sin(q2, 0, 0, 0)])
-        J[:,2] = np.array([-self.d2*np.sin(q3)*np.cos(q1), -self.d2*np.sin(q3)*np.sin(q1), -self.d2*np.cos(q3, 0, 0, 0)])
-        J[:,3] = np.array([0, 0, 0, 0, 0, 1])
+        J[:,0] = np.array([l*np.sin(q1),                    l*np.cos(q1),                   0,                0, 0, 1]) #q1 derivatives
+        J[:,1] = np.array([-self.d1*np.cos(q2)*np.cos(q1), -self.d1*np.cos(q2)*np.sin(q1), self.d1*np.sin(q2, 0, 0, 0)]) #q2 derivatives
+        J[:,2] = np.array([-self.d2*np.sin(q3)*np.cos(q1), -self.d2*np.sin(q3)*np.sin(q1), -self.d2*np.cos(q3, 0, 0, 0)]) #q3 derivatives
+        J[:,3] = np.array([0, 0, 0, 0, 0, 1]) #q4 derivatives
         
         return J
         
@@ -130,30 +129,6 @@ class SwiftproController:
     #     static_transformStamped.header.frame_id = "/turtlebot/swiftpro/manipulator_base_link"
     #     static_transformStamped.child_frame_id = "swiftpro_base"
         
-        
-        
-    
-
-
-
-
-
-    # transform_pub.sendTransform(transform)
-    #     if node.current_pose is not None:
-    #         # Define the translation and rotation for the inverse TF (base_footprint to world)
-    #         translation = (self.current_pose[0], self.current_pose[1], 0) # Set the x, y, z coordinates
-    #         quaternion = tf.transformations.quaternion_from_euler(0, 0, self.current_pose[2])  # Convert euler angles to quaternion
-    #         rotation = (quaternion[0], quaternion[1], quaternion[2], quaternion[3])
-            
-    #         # Publish the inverse TF from world to base_footprint
-    #         self.broadcaster.sendTransform(
-    #             translation,
-    #             rotation,
-    #             rospy.Time.now(),
-    #             "turtlebot/base_footprint",
-    #             "world_ned"
-    #         )
-    
 
     def ee_publisher(self, x, y, z, yaw):
         mark = Marker()
