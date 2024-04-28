@@ -146,7 +146,7 @@ class Task:
 
 
 
-class Position2D(Task):
+class Position3D(Task):
     def __init__(self, name, desired, feedforward, gain, link):
         super().__init__(name, desired, feedforward, gain)
         self.J = np.zeros((desired.shape[0], 4))
@@ -156,21 +156,21 @@ class Position2D(Task):
         self.K = gain
 
     def update(self, robot):
-        self.J = robot.getLinkJacobian(self.link)[0:2, :]
+        self.J = robot.getLinkJacobian(self.link)[0:3, :]
         self.err = (
             self.K
             @ (
                 self.getDesired()
-                - robot.getLinkTransform(self.link)[0:2, 3].reshape(
+                - robot.getLinkTransform(self.link)[0:3, 3].reshape(
                     self.getDesired().shape
                 )
             )
         ) + self.getFeedForward().reshape(self.getDesired().shape)
 
         # Uncomment Following to change desired to a random position
-        if np.linalg.norm(self.err) < 0.05:
-            self.setDesired(np.random.uniform(-1.5, 1.5, size=(2, 1)))
-        pass
+        # if np.linalg.norm(self.err) < 0.05:
+        #     self.setDesired(np.random.uniform(-1.5, 1.5, size=(2, 1)))
+        # pass
 
     def track_err(self):
         self.err_hist.append(np.linalg.norm(self.getError()))
@@ -181,7 +181,7 @@ class Position2D(Task):
 """
 
 
-class Orientation2D(Task):
+class Orientation3D(Task):
     def __init__(self, name, desired, feedforward, gain, link):
         super().__init__(name, desired, feedforward, gain)
         self.J = np.zeros((1, 2))  # Initialize with proper dimensions
@@ -208,7 +208,7 @@ class Orientation2D(Task):
 """
 
 
-class Configuration2D(Task):
+class Configuration3D(Task):
     def __init__(self, name, desired, feedforward, gain, link):
         super().__init__(name, desired, feedforward, gain)
         self.J = np.zeros((5, 0))
@@ -338,7 +338,7 @@ class JointLimits(Task):
             return 1
 
 
-class Obstacle2D(Task):
+class Obstacle3D(Task):
     def __init__(
         self,
         name,
