@@ -200,3 +200,20 @@ class MobileManipulator:
         self.q = np.zeros((len(self.revolute), 1))
         self.eta = np.zeros((3, 1))
         self.update(np.zeros((self.dof, 1)), 0.0)
+        
+        
+    def getEEJacobian(self):
+        J = np.zeros((6, self.dof))
+        
+        q1, q2, q3, q4 = self.q
+        
+        d1p = -self.d1*np.sin(q2) #projection of d1 on x-axis 
+        d2p = self.d2*np.cos(q3) #projection of d2 on x-axis
+        l = self.bx + self.mx + d1p + d2p #total length from base to ee top projection 
+        
+        J[:,0] = np.array([l*np.sin(q1),                    l*np.cos(q1),                   0,                0, 0, 1]) #q1 derivatives
+        J[:,1] = np.array([-self.d1*np.cos(q2)*np.cos(q1), -self.d1*np.cos(q2)*np.sin(q1), self.d1*np.sin(q2, 0, 0, 0)]) #q2 derivatives
+        J[:,2] = np.array([-self.d2*np.sin(q3)*np.cos(q1), -self.d2*np.sin(q3)*np.sin(q1), -self.d2*np.cos(q3, 0, 0, 0)]) #q3 derivatives
+        J[:,3] = np.array([0, 0, 0, 0, 0, 1]) #q4 derivatives
+        
+        return J

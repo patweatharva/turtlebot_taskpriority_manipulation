@@ -28,11 +28,6 @@ class SwiftproController:
             self.tf_broadcaster = tf2_ros.TransformBroadcaster() #this line makes sure that the tf is published
             # self.ee_tf_static_publisher()
         
-        # robot kinematic parameters
-        self.dof = 4
-        self.q = np.zeros(self.dof).reshape(-1,1)
-        self.update_kinematics()
-        
         # robot arm dimensions
         self.bx = 13.2
         self.bz = 108.0  #74.7 + 33.33
@@ -40,6 +35,11 @@ class SwiftproController:
         self.d2 = 158.8  
         self.mz = 72.2
         self.mx = 56.5
+        
+        # robot kinematic parameters
+        self.dof = 4
+        self.q = np.zeros(self.dof).reshape(-1,1)
+        self.update_kinematics()
         
     def joint_state_callback(self, msg):
         if msg.name[0] == "swiftpro/joint1": 
@@ -68,7 +68,7 @@ class SwiftproController:
         print(self.x)
         print(self.y)
         print(self.z)
-        print(self.yaw) 
+        print(self.yaw)
         
         #transformation matrix
         self.T = np.array([[np.cos(self.yaw), -np.sin(self.yaw), 0, self.x],
@@ -81,7 +81,7 @@ class SwiftproController:
         
             transform = TransformStamped()
             transform.header.stamp = rospy.Time.now()
-            transform.header.frame_id = "swiftpro/manipulator_base"
+            transform.header.frame_id = "swiftpro/manipulator_base_link"
             transform.child_frame_id = "swiftpro/manipulator_ee"
             
             #translation
@@ -96,26 +96,8 @@ class SwiftproController:
             transform.transform.rotation.z = quaternion[2]
             transform.transform.rotation.w = quaternion[3]
             self.tf_broadcaster.sendTransform(transform)
-            
     
-    def getEEJacobian(self):
-        J = np.zeros((6, self.dof))
-        
-        q1, q2, q3, q4 = self.q
-        
-        d1p = -self.d1*np.sin(q2) #projection of d1 on x-axis 
-        d2p = self.d2*np.cos(q3) #projection of d2 on x-axis
-        l = self.bx + self.mx + d1p + d2p #total length from base to ee top projection 
-        
-        J[:,0] = np.array([l*np.sin(q1),                    l*np.cos(q1),                   0,                0, 0, 1]) #q1 derivatives
-        J[:,1] = np.array([-self.d1*np.cos(q2)*np.cos(q1), -self.d1*np.cos(q2)*np.sin(q1), self.d1*np.sin(q2, 0, 0, 0)]) #q2 derivatives
-        J[:,2] = np.array([-self.d2*np.sin(q3)*np.cos(q1), -self.d2*np.sin(q3)*np.sin(q1), -self.d2*np.cos(q3, 0, 0, 0)]) #q3 derivatives
-        J[:,3] = np.array([0, 0, 0, 0, 0, 1]) #q4 derivatives
-        
-        return J
-        
     
-            
     # def ee_tf_static_publisher(self):
         
     #     """
@@ -130,14 +112,14 @@ class SwiftproController:
     #     static_transformStamped.child_frame_id = "swiftpro_base"
         
 
-    def ee_publisher(self, x, y, z, yaw):
+    def ee_publisher(self, x, y, z):
         mark = Marker()
         mark.header.frame_id = "swiftpro/manipulator_base_link"
         mark.header.stamp = rospy.Time.now()
         mark.pose.position.x = x
         mark.pose.position.y = y
         mark.pose.position.z = z
-        mark.pose.orientation = "yaw"
+        mark.pose.orientation = 0.0
         mark.scale.x = 0.01
         mark.scale.y = 0.01
         mark.scale.z = 0.01
@@ -147,8 +129,6 @@ class SwiftproController:
         mark.color.b = 0.0
     
         self.marker_pub.publish(mark)
-        
-        
           
 
 if __name__ == '__main__':
