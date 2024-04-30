@@ -43,15 +43,15 @@ class SwiftproController:
         
     def joint_state_callback(self, msg):
         if msg.name[0] == "swiftpro/joint1": 
-            q1 = msg.position[0]
-            q2 = msg.position[1]
-            q3 = msg.position[2]
-            q4 = msg.position[3]
+            self.q[0,0] = msg.position[0]
+            self.q[1,0] = msg.position[1]
+            self.q[2,0] = msg.position[2]
+            self.q[3,0] = msg.position[3]
         
-            print(q1)
-            print(q2)
-            print(q3)
-            print(q4)
+            # print(q1)
+            # print(q2)
+            # print(q3)
+            # print(q4)
             
             self.update_kinematics()
     
@@ -75,6 +75,7 @@ class SwiftproController:
                             [np.sin(self.yaw), np.cos(self.yaw), 0, self.y],
                             [0, 0, 1, self.z],
                             [1, 0, 0, 1]])
+        self.ee_publisher(self.x, self.y, self.z)
         
         #ee updated pose publisher
         if self.publish_tf:
@@ -97,7 +98,6 @@ class SwiftproController:
             transform.transform.rotation.w = quaternion[3]
             self.tf_broadcaster.sendTransform(transform)
     
-    
     # def ee_tf_static_publisher(self):
         
     #     """
@@ -119,7 +119,10 @@ class SwiftproController:
         mark.pose.position.x = x
         mark.pose.position.y = y
         mark.pose.position.z = z
-        mark.pose.orientation = 0.0
+        mark.pose.orientation.w = 1.0
+        mark.pose.orientation.x = 0.0
+        mark.pose.orientation.y = 0.0
+        mark.pose.orientation.z = 0.0
         mark.scale.x = 0.01
         mark.scale.y = 0.01
         mark.scale.z = 0.01

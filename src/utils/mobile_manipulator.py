@@ -217,3 +217,5 @@ class MobileManipulator:
         J[:,3] = np.array([0, 0, 0, 0, 0, 1]) #q4 derivatives
         
         return J
+    
+    def getEETransform(self):

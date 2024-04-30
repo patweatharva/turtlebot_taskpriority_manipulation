@@ -12,6 +12,14 @@ class SwiftproController:
         # Passive joint position publisher (ROS control command)
         self.passive_joint_pub = rospy.Publisher("command", Float64MultiArray, queue_size=10)
         
+        #get goal position
+        
+        #use the forward kinematics (xyz ee)
+        
+        #calculate error (goal-xyz_ee)
+        
+        #calculate jacobian 
+        
     def joint_state_callback(self, msg):
         if len(msg.name) == 4:
             # Convert angles to degrees

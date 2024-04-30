@@ -10,9 +10,9 @@ class TP_controller:
         robot = mobile_manipulator()
         taskhandler = taskhandler(robot)
         
-        self.joint_state_sub=rospy.Subscriber(joint_state_topic, Type, self.jointstateCB)
-        self.odom_sub=rospy.Subscriber(odom_topic, type, self.odomCB)
-        self.task_sub=rospy.Subscriber(task_topic, type, self.taskCB)
+        self.joint_state_sub=rospy.Subscriber(joint_state_topic, JointState, self.jointstateCB)
+        self.odom_sub=rospy.Subscriber(odom_topic, type, self.odomCB) #change type to odom check 
+        self.task_sub=rospy.Subscriber(task_topic, type, self.taskCB) 
         
         # PUBLISHERS
         # Timer for TP controller (Velocity Commands)
