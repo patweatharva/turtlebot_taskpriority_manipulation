@@ -1,4 +1,4 @@
-import task
+from .task import *
 
 
 class taskHandler:
