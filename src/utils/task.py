@@ -10,7 +10,7 @@ class Task:
         FeedForward: Feedforward component for the task.
         K: Gain for the task.
         err_hist (list): History of task errors.
-        activation (int): Activation status of the task (1 for active, 0 for inactive).
+        activation (int): Activation status of the task (1 for active, 0 for inactive)
     """
 
     def __init__(self, name: str, desired, feedforward, gain):
