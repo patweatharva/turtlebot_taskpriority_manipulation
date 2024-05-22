@@ -51,11 +51,10 @@ class setGoal (py_trees.behaviour.Behaviour):
         pickup_goal.pose.orientation.w = q[3]
         self.blackboard.pickup_goal = pickup_goal
        
-
         return py_trees.common.Status.SUCCESS
 
 class moveTurtlebot (py_trees.behaviour.Behaviour):
-    # this one only moves the base of the robot. no arm behavior here.
+    # this is only for base movement of the robot, no arm behavior here
     def __init__(self, name): 
         super(moveTurtlebot, self).__init__(name)
         self.blackboard = self.attach_blackboard_client(name=self.name)
@@ -65,7 +64,7 @@ class moveTurtlebot (py_trees.behaviour.Behaviour):
     def setup(self):
         self.logger.debug("  %s [moveTurtlebot::setup()]" % self.name)
         self.goal_sent = False
-        self.client = actionlib.SimpleActionClient('move_turtlebot', MoveToGoalAction)
+        self.client = 
         rospy.loginfo("Waiting for move turtlebot action...")
         self.client.wait_for_server()
 

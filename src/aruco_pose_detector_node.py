@@ -60,7 +60,30 @@ class ArucoDetection:
                                                     odom.pose.pose.orientation.z,
                                                     odom.pose.pose.orientation.w])
         self.eta = np.array([odom.pose.pose.position.x, odom.pose.pose.position.y, yaw]).reshape(-1,1)
-    
+        
+        x = odom.pose.pose.position.x
+        y = odom.pose.pose.position.y
+        z = odom.pose.pose.position.z
+
+        # Extract the orientation quaternion
+        quaternion = [ 
+            odom.pose.pose.orientation.x,
+            odom.pose.pose.orientation.y,
+            odom.pose.pose.orientation.z,
+            odom.pose.pose.orientation.w
+        ]
+
+        # Convert the quaternion to a rotation matrix
+        wTr = tft.quaternion_matrix(quaternion)  # This returns a 4x4 matrix
+
+        # Set the translation
+        wTr[0, 3] = x
+        wTr[1, 3] = y
+        wTr[2, 3] = z
+
+        # Store the transformation matrix
+        self.transformation_matrix = wTr
+        
     #transform the obtained image to cv2 format to be used by the aruco detector
     def imageToCV(self, image): 
         """
@@ -103,19 +126,15 @@ class ArucoDetection:
             print("Aruco detected", ids)
             
             #estimate the aruco pose (returns the rotation and translation vector) 
-            rvec, tvec, _ = cv2.aruco.estimatePoseSingleMarkers(corners, self.marker_size, self.camera_matrix, self.dist_coeffs)
+            rvec, tvec, _ = cv2.aruco.estimatePoseSingleMarkers(corners[0], self.marker_size, self.camera_matrix, self.dist_coeffs)
             print("tvec", tvec)
-            print("rvec", rvec)
-            print("-" * 40)
+            print("rvec", rvec, "-" * 40)
+        
+            #draw the axis of the aruco marker
+            #self.drawAxis(cv_image, self.camera_matrix, self.dist_coeffs, rvec[i], tvec[i], 0.01)
             
-            if len(ids) > 1: #for each marker detected
-                
-                #draw the axis of the aruco marker
-                #self.drawAxis(cv_image, self.camera_matrix, self.dist_coeffs, rvec[i], tvec[i], 0.01)
-                
-                # #publish the pose of the aruco marker in the world frame
-                self.transformArucoPose(rvec[0], tvec[0])
-            
+            # #publish the pose of the aruco marker in the world frame
+            self.transformArucoPose(rvec, tvec)
             
         else :
             print("No Aruco detected")
@@ -140,7 +159,6 @@ class ArucoDetection:
         print(f"camera_to_aruco: {point.point.x}, {point.point.y}, {point.point.z}")
         print(point.header.frame_id)
 
-
         #arrange translation and rotation matrices for aruco to camera transformation 
         cTa= np.eye(4)
         cTa[0:3, 0:3] = R_ac                #rotation part
@@ -163,15 +181,16 @@ class ArucoDetection:
         print(bTc, "t matrix base to camera", "\n")
         
         ################### TRANSFORMATION FROM BASE TO ROBOT FRAME ##########################
-            
-        r = self.eta
-        wTb = np.eye(4)
-        wTb = np.array(
-                [[np.cos(r[2,0]), -np.sin(r[2,0]), 0, r[0,0]],
-                [np.sin(r[2,0]), np.cos(r[2,0]), 0, r[1,0]],
-                [0, 0, 1, 0],
-                [0, 0, 0, 1]]).reshape(4,4)
-        print(wTb, "t matrix world to base", "\n")
+        
+        # r = self.eta
+        # wTb = np.eye(4)
+        # wTb = np.array(
+        #         [[np.cos(r[2,0]), -np.sin(r[2,0]), 0, r[0,0]],
+        #         [np.sin(r[2,0]), np.cos(r[2,0]), 0, r[1,0]],
+        #         [0, 0, 1, 0],
+        #         [0, 0, 0, 1]]).reshape(4,4)
+        # print(wTb, "t matrix world to base", "\n")
+        
         
         #to place the aruco frame at the top center of the box
         centering_pose = np.array([
@@ -181,13 +200,13 @@ class ArucoDetection:
                                 [0, 0, 0, 1]
                             ])              
         
-        wTa_uncentered = wTb @ bTc @ cTa #world to base * base to camera * camera to aruco
+        wTa_uncentered = self.transformation_matrix @ bTc @ cTa #world to base * base to camera * camera to aruco
         wTa = wTa_uncentered @ centering_pose #world to base * topcenter matrix  
         print(wTa, "wTa")
         
         # to get the pose.orientation of the aruco in world ned frame
         wTa_q = tft.quaternion_from_matrix(wTa)
-       
+
         
         #################### POSE PUBLISHER OF ARUCO IN WORLD NED FRAME #############################
         aruco_position = PoseStamped()
