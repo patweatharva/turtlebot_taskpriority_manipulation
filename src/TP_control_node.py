@@ -3,7 +3,6 @@ import rospy
 import tf
 from utils.task import *
 from utils.mobile_manipulator import *
-from utils.taskhandler import *
 from utils.controller import *
 from std_msgs.msg import Float64MultiArray
 from sensor_msgs.msg import JointState
